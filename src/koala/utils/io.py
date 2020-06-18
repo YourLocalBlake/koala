@@ -8,6 +8,8 @@ import datetime
 from astropy.io import fits
 import numpy as np
 
+from camel import Camel
+
 from .._version import get_versions
 
 version = get_versions()["version"]
@@ -40,17 +42,11 @@ def read_table(file, format):
     data = [[] for x in range(data_len)]
     for i in range(0, data_len):
         if format[i] == "i":
-            data[i] = np.loadtxt(
-                file, skiprows=0, unpack=True, usecols=[i], dtype=int
-            )
+            data[i] = np.loadtxt(file, skiprows=0, unpack=True, usecols=[i], dtype=int)
         if format[i] == "s":
-            data[i] = np.loadtxt(
-                file, skiprows=0, unpack=True, usecols=[i], dtype=str
-            )
+            data[i] = np.loadtxt(file, skiprows=0, unpack=True, usecols=[i], dtype=str)
         if format[i] == "f":
-            data[i] = np.loadtxt(
-                file, skiprows=0, unpack=True, usecols=[i], dtype=float
-            )
+            data[i] = np.loadtxt(file, skiprows=0, unpack=True, usecols=[i], dtype=float)
     return data
 
 
@@ -118,12 +114,7 @@ def spectrum_to_text_file(wavelength, flux, filename="spectrum.txt"):
 
 
 def spectrum_to_fits_file(
-    wavelength,
-    flux,
-    filename="spectrum.fits",
-    name="spectrum",
-    exptime=1,
-    CRVAL1_CDELT1_CRPIX1=[0, 0, 0],
+    wavelength, flux, filename="spectrum.fits", name="spectrum", exptime=1, CRVAL1_CDELT1_CRPIX1=[0, 0, 0],
 ):
     """
     Routine to save a given 1D spectrum into a fits file.
@@ -157,26 +148,18 @@ def spectrum_to_fits_file(
         hdu.header["CRPIX1"] = 1.0
         hdu.header["CDELT1"] = (wavelength[-1] - wavelength[0]) / (len(wavelength) - 1)
     else:
-        hdu.header["CRVAL1"] = CRVAL1_CDELT1_CRPIX1[
-            0
-        ]  # 7.692370611909E+03  / Co-ordinate value of axis 1
+        hdu.header["CRVAL1"] = CRVAL1_CDELT1_CRPIX1[0]  # 7.692370611909E+03  / Co-ordinate value of axis 1
         hdu.header["CDELT1"] = CRVAL1_CDELT1_CRPIX1[1]  # 1.575182431607E+00
-        hdu.header["CRPIX1"] = CRVAL1_CDELT1_CRPIX1[
-            2
-        ]  # 1024. / Reference pixel along axis 1
+        hdu.header["CRPIX1"] = CRVAL1_CDELT1_CRPIX1[2]  # 1024. / Reference pixel along axis 1
     # Extra info
     hdu.header["OBJECT"] = name
     hdu.header["TOTALEXP"] = exptime
     hdu.header["HISTORY"] = "Spectrum derived using the KOALA Python pipeline"
-    hdu.header[
-        "HISTORY"
-    ] = "Developed by Angel Lopez-Sanchez, Yago Ascasibar, Lluis Galbany et al."
+    hdu.header["HISTORY"] = "Developed by Angel Lopez-Sanchez, Yago Ascasibar, Lluis Galbany et al."
     hdu.header["HISTORY"] = version
     now = datetime.datetime.now()
     hdu.header["HISTORY"] = now.strftime("Created on %d %b %Y, %H:%M:%S")
-    hdu.header["DATE"] = now.strftime(
-        "%Y-%m-%dT%H:%M:%S"
-    )  # '2002-09-16T18:52:44'   # /Date of FITS file creation
+    hdu.header["DATE"] = now.strftime("%Y-%m-%dT%H:%M:%S")  # '2002-09-16T18:52:44'   # /Date of FITS file creation
 
     hdu.writeto(filename, overwrite=True)
     print("\n> Spectrum saved in fits file", filename, " !!")
@@ -189,21 +172,12 @@ def spectrum_to_fits_file(
             "  CRVAL1_CDELT1_CRPIX1 values not given, using ",
             wavelength[0],
             "1",
-            (wavelength[-1] - wavelength[0]) / (len(wavelength) - 1)
+            (wavelength[-1] - wavelength[0]) / (len(wavelength) - 1),
         )
 
 
 def save_bluered_fits_file(
-    blue_cube,
-    red_cube,
-    fits_file,
-    fcalb=[0],
-    fcalr=[0],
-    ADR=False,
-    objeto="",
-    description="",
-    trimb=[0],
-    trimr=[0],
+    blue_cube, red_cube, fits_file, fcalb=[0], fcalr=[0], ADR=False, objeto="", description="", trimb=[0], trimr=[0],
 ):
     """
     Routine combine blue + red files and save result in a fits file fits file
@@ -280,9 +254,7 @@ def save_bluered_fits_file(
     #    fits_image_hdu.header["CD1_1"]  = (wavelength[-1]-wavelength[0])/len(wavelength)
     #    fits_image_hdu.header["LTM1_1"] = 1.
 
-    fits_image_hdu.header[
-        "COFILES"
-    ] = blue_cube.number_of_combined_files  # Number of combined files
+    fits_image_hdu.header["COFILES"] = blue_cube.number_of_combined_files  # Number of combined files
     fits_image_hdu.header["OFFSETS"] = blue_cube.offsets_files  # Offsets
 
     fits_image_hdu.header["ADRCOR"] = np.str(ADR)
@@ -330,9 +302,7 @@ def save_fits_file(combined_cube, fits_file, description="", ADR=False):  # fcal
     # wavelength =  combined_cube.wavelength
 
     fits_image_hdu.header["HISTORY"] = "Combined datacube from KOALA Python pipeline"
-    fits_image_hdu.header[
-        "HISTORY"
-    ] = "Developed by Angel Lopez-Sanchez, Yago Ascasibar, Lluis Galbany et al."
+    fits_image_hdu.header["HISTORY"] = "Developed by Angel Lopez-Sanchez, Yago Ascasibar, Lluis Galbany et al."
     fits_image_hdu.header["HISTORY"] = version  # 'Version 0.10 - 12th February 2019'
     now = datetime.datetime.now()
     fits_image_hdu.header["HISTORY"] = now.strftime("Created on %d %b %Y, %H:%M:%S")
@@ -360,9 +330,7 @@ def save_fits_file(combined_cube, fits_file, description="", ADR=False):  # fcal
         SPECTID = "RD"
     fits_image_hdu.header["SPECTID"] = SPECTID  # / Spectrograph ID
 
-    fits_image_hdu.header[
-        "DICHROIC"
-    ] = "X5700"  # / Dichroic name   ---> CHANGE if using X6700!!
+    fits_image_hdu.header["DICHROIC"] = "X5700"  # / Dichroic name   ---> CHANGE if using X6700!!
 
     fits_image_hdu.header["OBJECT"] = combined_cube.object
     fits_image_hdu.header["TOTALEXP"] = combined_cube.total_exptime
@@ -377,31 +345,19 @@ def save_fits_file(combined_cube, fits_file, description="", ADR=False):  # fcal
     fits_image_hdu.header["EQUINOX"] = 2000  # / [yr] Equinox of equatorial coordinates
     fits_image_hdu.header["WCSAXES"] = 3  # / Number of coordinate axes
 
-    fits_image_hdu.header["CRPIX1"] = (
-        combined_cube.data.shape[1] / 2.0
-    )  # / Pixel coordinate of reference point
+    fits_image_hdu.header["CRPIX1"] = combined_cube.data.shape[1] / 2.0  # / Pixel coordinate of reference point
     fits_image_hdu.header["CDELT1"] = (
         -combined_cube.pixel_size_arcsec / 3600.0
     )  # / Coordinate increment at reference point
-    fits_image_hdu.header[
-        "CTYPE1"
-    ] = "RA--TAN"  # 'DEGREE'                               # / Coordinate type code
-    fits_image_hdu.header[
-        "CRVAL1"
-    ] = combined_cube.RA_centre_deg  # / Coordinate value at reference point
+    fits_image_hdu.header["CTYPE1"] = "RA--TAN"  # 'DEGREE'                               # / Coordinate type code
+    fits_image_hdu.header["CRVAL1"] = combined_cube.RA_centre_deg  # / Coordinate value at reference point
 
-    fits_image_hdu.header["CRPIX2"] = (
-        combined_cube.data.shape[2] / 2.0
-    )  # / Pixel coordinate of reference point
+    fits_image_hdu.header["CRPIX2"] = combined_cube.data.shape[2] / 2.0  # / Pixel coordinate of reference point
     fits_image_hdu.header["CDELT2"] = (
         combined_cube.pixel_size_arcsec / 3600.0
     )  # Coordinate increment at reference point
-    fits_image_hdu.header[
-        "CTYPE2"
-    ] = "DEC--TAN"  # 'DEGREE'                               # / Coordinate type code
-    fits_image_hdu.header[
-        "CRVAL2"
-    ] = combined_cube.DEC_centre_deg  # / Coordinate value at reference point
+    fits_image_hdu.header["CTYPE2"] = "DEC--TAN"  # 'DEGREE'                               # / Coordinate type code
+    fits_image_hdu.header["CRVAL2"] = combined_cube.DEC_centre_deg  # / Coordinate value at reference point
 
     fits_image_hdu.header["RAcen"] = combined_cube.RA_centre_deg
     fits_image_hdu.header["DECcen"] = combined_cube.DEC_centre_deg
@@ -416,16 +372,10 @@ def save_fits_file(combined_cube, fits_file, description="", ADR=False):  # fcal
     fits_image_hdu.header["CRVAL3"] = combined_cube.CRVAL1_CDELT1_CRPIX1[
         0
     ]  # 7.692370611909E+03  / Co-ordinate value of axis 3
-    fits_image_hdu.header["CDELT3"] = combined_cube.CRVAL1_CDELT1_CRPIX1[
-        1
-    ]  # 1.575182431607E+00
-    fits_image_hdu.header["CRPIX3"] = combined_cube.CRVAL1_CDELT1_CRPIX1[
-        2
-    ]  # 1024. / Reference pixel along axis 3
+    fits_image_hdu.header["CDELT3"] = combined_cube.CRVAL1_CDELT1_CRPIX1[1]  # 1.575182431607E+00
+    fits_image_hdu.header["CRPIX3"] = combined_cube.CRVAL1_CDELT1_CRPIX1[2]  # 1024. / Reference pixel along axis 3
 
-    fits_image_hdu.header["COFILES"] = (
-        len(combined_cube.offsets_files) + 1
-    )  # Number of combined files
+    fits_image_hdu.header["COFILES"] = len(combined_cube.offsets_files) + 1  # Number of combined files
     offsets_text = " "
     for i in range(len(combined_cube.offsets_files)):
         if i != 0:
@@ -455,9 +405,7 @@ def save_fits_file(combined_cube, fits_file, description="", ADR=False):  # fcal
     fits_image_hdu.header["DESCRIP"] = description
 
     for file in range(len(combined_cube.rss_list)):
-        fits_image_hdu.header["HISTORY"] = (
-            "RSS file " + np.str(file + 1) + ":" + combined_cube.rss_list[file]
-        )
+        fits_image_hdu.header["HISTORY"] = "RSS file " + np.str(file + 1) + ":" + combined_cube.rss_list[file]
 
     #    hdu_list = fits.HDUList([fits_image_hdu, error_hdu])
     #    hdu_list = fits.HDUList([fits_image_hdu, wavelengths_hdu, flux_correction_hdu])
@@ -474,9 +422,7 @@ def save_fits_file(combined_cube, fits_file, description="", ADR=False):  # fcal
 # -----------------------------------------------------------------------------
 
 
-def save_rss_fits(
-    rss, data=[[0], [0]], fits_file="RSS_rss.fits", description=""
-):  # fcal=[0],     # TASK_save_rss_fits
+def save_rss_fits(rss, data=[[0], [0]], fits_file="RSS_rss.fits", description=""):  # fcal=[0],     # TASK_save_rss_fits
     """
     Routine to save RSS data as fits
 
@@ -498,9 +444,7 @@ def save_rss_fits(
     fits_image_hdu = fits.PrimaryHDU(data)
 
     fits_image_hdu.header["HISTORY"] = "RSS from KOALA Python pipeline"
-    fits_image_hdu.header[
-        "HISTORY"
-    ] = "Developed by Angel Lopez-Sanchez, Yago Ascasibar, Lluis Galbany et al."
+    fits_image_hdu.header["HISTORY"] = "Developed by Angel Lopez-Sanchez, Yago Ascasibar, Lluis Galbany et al."
     fits_image_hdu.header["HISTORY"] = version  # 'Version 0.10 - 12th February 2019'
     now = datetime.datetime.now()
     fits_image_hdu.header["HISTORY"] = now.strftime("Created on %d %b %Y, %H:%M:%S")
@@ -528,9 +472,7 @@ def save_rss_fits(
         SPECTID = "RD"
     fits_image_hdu.header["SPECTID"] = SPECTID  # / Spectrograph ID
 
-    fits_image_hdu.header[
-        "DICHROIC"
-    ] = "X5700"  # / Dichroic name   ---> CHANGE if using X6700!!
+    fits_image_hdu.header["DICHROIC"] = "X5700"  # / Dichroic name   ---> CHANGE if using X6700!!
 
     fits_image_hdu.header["OBJECT"] = rss.object
     fits_image_hdu.header["EXPOSED"] = rss.exptime
@@ -550,22 +492,12 @@ def save_rss_fits(
     fits_image_hdu.header["CTYPE1"] = "Wavelength"  # / Label for axis 2
     fits_image_hdu.header["CUNIT1"] = "Angstroms"  # / Units for axis 2
 
-    fits_image_hdu.header["CRVAL1"] = rss.CRVAL1_CDELT1_CRPIX1[
-        0
-    ]  # / Co-ordinate value of axis 2
+    fits_image_hdu.header["CRVAL1"] = rss.CRVAL1_CDELT1_CRPIX1[0]  # / Co-ordinate value of axis 2
     fits_image_hdu.header["CDELT1"] = rss.CRVAL1_CDELT1_CRPIX1[1]  #
-    fits_image_hdu.header["CRPIX1"] = rss.CRVAL1_CDELT1_CRPIX1[
-        2
-    ]  # 1024. / Reference pixel along axis 2
-    fits_image_hdu.header[
-        "CRVAL2"
-    ] = 5.000000000000e-01  # / Co-ordinate value of axis 2
-    fits_image_hdu.header[
-        "CDELT2"
-    ] = 1.000000000000e00  # / Co-ordinate increment along axis 2
-    fits_image_hdu.header[
-        "CRPIX2"
-    ] = 1.000000000000e00  # / Reference pixel along axis 2
+    fits_image_hdu.header["CRPIX1"] = rss.CRVAL1_CDELT1_CRPIX1[2]  # 1024. / Reference pixel along axis 2
+    fits_image_hdu.header["CRVAL2"] = 5.000000000000e-01  # / Co-ordinate value of axis 2
+    fits_image_hdu.header["CDELT2"] = 1.000000000000e00  # / Co-ordinate increment along axis 2
+    fits_image_hdu.header["CRPIX2"] = 1.000000000000e00  # / Reference pixel along axis 2
 
     if description == "":
         description = rss.description
@@ -609,14 +541,12 @@ def save_rss_fits(
     col5 = fits.Column(name="Zeros", format="I", array=np.array(header2_0))
     col6 = fits.Column(name="Delta_RA", format="D", array=np.array(header2_delta_RA))
     col7 = fits.Column(name="Delta_Dec", format="D", array=np.array(header2_delta_DEC))
-    col8 = fits.Column(
-        name="Fibre_OLD", format="I", array=np.array(header2_original_fibre)
-    )
+    col8 = fits.Column(name="Fibre_OLD", format="I", array=np.array(header2_original_fibre))
 
     cols = fits.ColDefs([col1, col2, col3, col4, col5, col6, col7, col8])
     header2_hdu = fits.BinTableHDU.from_columns(cols)
 
-    header2_hdu.header["CENRA"] = rss.RA_centre_deg / 180 / np.pi # Must be in radians
+    header2_hdu.header["CENRA"] = rss.RA_centre_deg / 180 / np.pi  # Must be in radians
     header2_hdu.header["CENDEC"] = rss.DEC_centre_deg / 180 / np.pi
 
     hdu_list = fits.HDUList(
@@ -625,3 +555,72 @@ def save_rss_fits(
 
     hdu_list.writeto(fits_file, overwrite=True)
     print("  RSS data saved to file ", fits_file)
+
+
+def update_sci_yaml_file(file_loc, dict_to_edit, entry_to_update, value):
+    """ Update the science images .yml file
+
+       Opens the file at file_loc, gets the dictionary with dict_to_edit, and updates entry_to_update with value
+
+       Parameters
+       ----------
+       file_loc: str
+           Location of the config_calibration_stars.yml file
+       dict_to_edit: str
+           Name of dict in the .yml file to update, e.g. science_images
+       entry_to_update: str
+           The entry, e.g. skyflat, to update
+       value: str
+           the location of the new file to use.
+
+       Returns
+       -------
+       Nothing
+           Simply updates the .yml file
+       """
+    with open(file_loc, "r") as f:
+        yml_file = Camel().load(f.read())
+        data = yml_file[dict_to_edit]
+        if dict_to_edit is not "science_images":
+            data.update({entry_to_update: value})
+        else:  # It is a list of star images we need to update.
+            data["science_images"].append(value)
+    with open(file_loc, "w") as f:
+        f.write(Camel().dump(yml_file))
+
+
+def update_cal_yaml_file(file_loc, star_name, entry_to_update, value):
+    """ Update the calibration stars .yml file
+
+    Opens the file at file_loc, gets the dictionary with star star_name, gets the entry entry_to_update,
+    and updates it to value.
+
+    Parameters
+    ----------
+    file_loc: str
+        Location of the config_calibration_stars.yml file
+    star_name: str
+        Name of star in .yml file to update, e.g. H600
+    entry_to_update: str
+        The entry, e.g. response, to update
+    value: str
+        the location of the new file to use.
+
+    Returns
+    -------
+    Nothing
+        Simply updates the .yml file
+    """
+
+    with open(file_loc, "r") as f:
+        yml_file = Camel().load(f.read())
+        data = yml_file["files_for_generating_calibration_data"]
+        list_index = next((index for (index, d) in enumerate(data) if d["name"] == star_name), None,)
+        # Find the index (index) of the dictionary (data) which contains the dictionary key (d["name"]) equal to the
+        # input star_name
+        if entry_to_update is not "calib_star":
+            data[list_index].update({entry_to_update: value})
+        else:  # We need to update a list of stars.
+            data[list_index]["calib_star"].append(value)
+    with open(file_loc, "w") as f:
+        f.write(Camel().dump(yml_file))
